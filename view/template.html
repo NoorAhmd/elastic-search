@@ -1,0 +1,152 @@
+<!-- template.html -->
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+<div class="container" id="app">
+    <div class="row">
+        <div class="head">
+            <h1>Search Cities around the world</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="body">
+            <div class="search__container">
+                <input class="search__input" type="text" placeholder="Search" v-model="query">
+            </div>
+        </div>
+    </div>
+    <!-- <div class="row">
+        <div class="col-md-4 col-md-offset-3">
+            <form action="" class="search-form">
+                <div class="form-group has-feedback">
+                    <label for="search" class="sr-only">Search</label>
+                    <input type="text" class="form-control" name="search" id="search" placeholder="search"
+                        v-model="query">
+                    <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                </div>
+            </form>
+        </div>
+    </div> -->
+    <div class="row">
+        <div class="col-md-3" v-for="result in results">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <!-- display the city name and country  -->
+                    {{ result._source.name }}, {{ result._source.country }}
+                </div>
+                <div class="panel-body">
+                    <!-- display the latitude and longitude of the city  -->
+                    <p>lat:{{ result._source.lat }}, long: {{ result._source.lng }}.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--- some styling for the page -->
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .row {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+
+    .head,
+    .body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .head h1 {
+        font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    }
+
+    .search__container {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .search__title {
+        font-size: 22px;
+        font-weight: 900;
+        text-align: center;
+        color: #FF8B88;
+    }
+
+    .search__input {
+        width: 38%;
+        padding: 12px 24px;
+        box-shadow: 0px 7px 1px #00000021;
+        background-color: transparent;
+        transition: transform 250ms ease-in-out;
+        font-size: 14px;
+        line-height: 18px;
+        color: #575756;
+        background-color: transparent;
+        /*         background-image: url(http://mihaeltomic.com/codepen/input-search/ic_search_black_24px.svg); */
+        background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3Cpath d='M0 0h24v24H0z' fill='none'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-size: 18px 18px;
+        background-position: 95% center;
+        border-radius: 50px;
+        border: 1px solid #575756;
+        transition: all 250ms ease-in-out;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+    }
+
+    .search__input::placeholder {
+        color: color(#575756 a(0.8));
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
+
+    .search__input:hover,
+    .search__input:focus {
+        padding: 12px 0;
+        outline: 0;
+        border: 1px solid transparent;
+        border-bottom: 1px solid #575756;
+        border-radius: 0;
+        background-position: 100% center;
+    }
+</style>
+<script>
+    // create a new Vue instance
+    var app = new Vue({
+        el: '#app',
+        // declare the data for the component (An array that houses the results and a query that holds the current search string)
+        data: {
+            results: [],
+            query: ''
+        },
+        // declare methods in this Vue component. here only one method which performs the search is defined
+        methods: {
+            // make an axios request to the server with the current search query
+            search: function () {
+                console.log(`client search query = ${JSON.stringify(this.query)}`)
+                axios.get("http://127.0.0.1:3001/search?q=" + this.query)
+                    .then(response => {
+                        console.log(`client search response = ${JSON.stringify(response)}`)
+                        this.results = response.data;
+
+                    })
+            }
+        },
+        // declare Vue watchers
+        watch: {
+            // watch for change in the query string and recall the search method
+            query: function () {
+                this.search();
+            }
+        }
+
+    })
+</script>
