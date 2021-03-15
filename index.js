@@ -6,8 +6,8 @@ const cors = require('cors')
 require('dotenv').config()
 
 const app = express()
-const elasticClient = new Elasticsearch.Client({ host: process.env.ELASTIC_PORT })
-const queryIndex = 'cities'
+const elasticClient = new Elasticsearch.Client({ host: process.env.ELASTIC_IP })
+const queryIndex = 'test'
 const PORT = process.env.SERVER_PORT
 
 
@@ -16,7 +16,7 @@ elasticClient.ping({ requestTimeout: 30000 }, (err) => {
         console.log('Elastic search is down!')
         return
     }
-    console.log('Elastc search is ready to run!')
+    console.log('Elastic search is ready to run!')
 })
 app.use(express.json())
 app.use(cors())
@@ -29,16 +29,19 @@ app.get("/", function (req, res) {
 app.get('/search', async (req, res) => {
     const query = req.query.q
     const body = {
+        size: 500,
+        from: 0,
         query: {
-            wildcard: {
-                name: `${query}*`
+            query_string: {
+                fields: ["name"],
+                query: `${query}*`,
+                default_operator: "AND"
             }
         }
     }
     try {
         const result = await elasticClient.search({ index: queryIndex, body: body, type: "_doc" })
         res.status(200).send(result.hits.hits)
-        console.log(result.hits.hits)
     } catch (error) {
         res.status(400).send(error)
     }

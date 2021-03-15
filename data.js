@@ -5,7 +5,7 @@ const indexName = 'test'
 const typeName = '_doc'
 
 const cities = require(jsonFile)
-const elasticClient = new Elasticsearch.Client({ host: process.env.ELASTIC_PORT })
+const elasticClient = new Elasticsearch.Client({ host: process.env.ELASTIC_IP })
 
 elasticClient.ping({ requestTimeout: 30000 }, (err) => {
     if (err) {
